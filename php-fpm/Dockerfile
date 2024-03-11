@@ -10,6 +10,7 @@
 #    https://hub.docker.com/r/laradock/php-fpm/tags/
 #
 # Note: Base Image name format {image-tag}-{php-version}
+# Note: docker build -t rightrun/php72-fpm:fpm --build-arg "LARADOCK_PHP_VERSION=7.2" --build-arg "INSTALL_SWOOLE=true" --build-arg "CHANGE_SOURCE=true" --buid-arg "INSTALL_BCMATH=true" --build-arg "INSTALL_YAF=true" .
 #
 
 ARG LARADOCK_PHP_VERSION
@@ -41,6 +42,8 @@ RUN set -xe; \
       apt-utils \
       gnupg2 \
       git \
+      procps \
+      vim \
       #
       #--------------------------------------------------------------------------
       # Mandatory Software's Installation
@@ -72,6 +75,19 @@ RUN set -xe; \
 # Example:
 #   - INSTALL_SOAP=true
 #
+
+###########################################################################
+# YAF:
+###########################################################################
+
+ARG INSTALL_YAF=false
+
+RUN if [ ${INSTALL_YAF} = true ]; then \
+    # Install Php TAINT Extension
+      pecl install yaf-3.0.7 && \
+      docker-php-ext-enable yaf && \
+      php -m | grep -q 'yaf' \
+;fi
 
 ###########################################################################
 # BZ2:
