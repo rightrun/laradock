@@ -10,7 +10,8 @@
 #    https://hub.docker.com/r/laradock/php-fpm/tags/
 #
 # Note: Base Image name format {image-tag}-{php-version}
-# Note: docker build -t rightrun/php72-fpm:fpm --build-arg "LARADOCK_PHP_VERSION=7.2" --build-arg "INSTALL_SWOOLE=true" --build-arg "CHANGE_SOURCE=true" --buid-arg "INSTALL_BCMATH=true" --build-arg "INSTALL_YAF=true" .
+# Note: docker build -t rightrun/php72-fpm:fpm --build-arg "LARADOCK_PHP_VERSION=7.2" --build-arg "LOCALE=C.UTF-8" .
+# Note: docker build -t rightrun/php72-fpm:fpm --build-arg "LARADOCK_PHP_VERSION=5.6" --build-arg "LOCALE=C.UTF-8" .
 #
 
 ARG LARADOCK_PHP_VERSION
@@ -26,7 +27,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # If you're in China, or you need to change sources, will be set CHANGE_SOURCE to true in .env.
 
-ARG CHANGE_SOURCE=false
+ARG CHANGE_SOURCE=true
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
     # Change application source from deb.debian.org to aliyun source
     sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
@@ -43,6 +44,8 @@ RUN set -xe; \
       gnupg2 \
       git \
       procps \
+      inetutils-ping \
+      net-tools \
       vim \
       #
       #--------------------------------------------------------------------------
@@ -93,7 +96,7 @@ RUN if [ ${INSTALL_YAF} = true ]; then \
 # BZ2:
 ###########################################################################
 
-ARG INSTALL_BZ2=false
+ARG INSTALL_BZ2=true
 RUN if [ ${INSTALL_BZ2} = true ]; then \
   apt-get -yqq install libbz2-dev; \
   docker-php-ext-install bz2 \
@@ -103,7 +106,7 @@ RUN if [ ${INSTALL_BZ2} = true ]; then \
 # Enchant:
 ###########################################################################
 
-ARG INSTALL_ENCHANT=false
+ARG INSTALL_ENCHANT=true
 RUN if [ ${INSTALL_ENCHANT} = true ]; then \
   apt-get install -yqq libenchant-dev; \
   docker-php-ext-install enchant; \
@@ -114,7 +117,7 @@ fi
 # GMP (GNU Multiple Precision):
 ###########################################################################
 
-ARG INSTALL_GMP=false
+ARG INSTALL_GMP=true
 
 RUN if [ ${INSTALL_GMP} = true ]; then \
     # Install the GMP extension
@@ -129,7 +132,7 @@ RUN if [ ${INSTALL_GMP} = true ]; then \
 # GnuPG:
 ###########################################################################
 
-ARG INSTALL_GNUPG=false
+ARG INSTALL_GNUPG=true
 
 RUN if [ ${INSTALL_GNUPG} = true ]; then \
       apt-get -yq install libgpgme-dev; \
@@ -184,7 +187,7 @@ RUN if [ ${INSTALL_SOAP} = true ]; then \
 # XSL:
 ###########################################################################
 
-ARG INSTALL_XSL=false
+ARG INSTALL_XSL=true
 
 RUN if [ ${INSTALL_XSL} = true ]; then \
     # Install the xsl extension
@@ -207,8 +210,8 @@ RUN if [ ${INSTALL_PGSQL} = true ]; then \
 # pgsql client
 ###########################################################################
 
-ARG INSTALL_PG_CLIENT=false
-ARG INSTALL_POSTGIS=false
+ARG INSTALL_PG_CLIENT=true
+ARG INSTALL_POSTGIS=true
 ARG PG_CLIENT_VERSION
 
 RUN if [ ${INSTALL_PG_CLIENT} = true ]; then \
@@ -228,7 +231,7 @@ RUN if [ ${INSTALL_PG_CLIENT} = true ]; then \
 # xDebug:
 ###########################################################################
 
-ARG INSTALL_XDEBUG=false
+ARG INSTALL_XDEBUG=true
 ARG XDEBUG_PORT=9003
 
 RUN if [ ${INSTALL_XDEBUG} = true ]; then \
@@ -316,7 +319,7 @@ RUN if [ ${INSTALL_XDEBUG} = false -a ${INSTALL_BLACKFIRE} = true ]; then \
 # PHP REDIS EXTENSION
 ###########################################################################
 
-ARG INSTALL_PHPREDIS=false
+ARG INSTALL_PHPREDIS=true
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
@@ -358,7 +361,7 @@ RUN set -eux; \
 # Taint EXTENSION
 ###########################################################################
 
-ARG INSTALL_TAINT=false
+ARG INSTALL_TAINT=true
 
 RUN if [ ${INSTALL_TAINT} = true ]; then \
     # Install Php TAINT Extension
@@ -439,7 +442,7 @@ RUN set -eux; \
 # AMQP:
 ###########################################################################
 
-ARG INSTALL_AMQP=false
+ARG INSTALL_AMQP=true
 
 RUN set -eux; \
     if [ ${INSTALL_AMQP} = true ]; then \
@@ -520,7 +523,7 @@ RUN if [ ${INSTALL_GEARMAN} = true ]; then \
 # xlswriter:
 ###########################################################################
 
-ARG INSTALL_XLSWRITER=false
+ARG INSTALL_XLSWRITER=true
 RUN set -eux; \
     if [ ${INSTALL_XLSWRITER} = true ]; then \
       # Install Php xlswriter Extension \
@@ -537,7 +540,7 @@ RUN set -eux; \
 # pcntl
 ###########################################################################
 
-ARG INSTALL_PCNTL=false
+ARG INSTALL_PCNTL=true
 RUN if [ ${INSTALL_PCNTL} = true ]; then \
     # Installs pcntl, helpful for running Horizon
     docker-php-ext-install pcntl \
@@ -547,7 +550,7 @@ RUN if [ ${INSTALL_PCNTL} = true ]; then \
 # bcmath:
 ###########################################################################
 
-ARG INSTALL_BCMATH=false
+ARG INSTALL_BCMATH=true
 
 RUN if [ ${INSTALL_BCMATH} = true ]; then \
     # Install the bcmath extension
@@ -558,7 +561,7 @@ RUN if [ ${INSTALL_BCMATH} = true ]; then \
 # PHP Memcached:
 ###########################################################################
 
-ARG INSTALL_MEMCACHED=false
+ARG INSTALL_MEMCACHED=true
 
 RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
     # Install the php memcached extension
@@ -574,7 +577,7 @@ RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
 # Exif:
 ###########################################################################
 
-ARG INSTALL_EXIF=false
+ARG INSTALL_EXIF=true
 
 RUN if [ ${INSTALL_EXIF} = true ]; then \
     # Enable Exif PHP extentions requirements
@@ -704,7 +707,7 @@ RUN if [ ${INSTALL_IONCUBE} = true ]; then \
 # Opcache:
 ###########################################################################
 
-ARG INSTALL_OPCACHE=false
+ARG INSTALL_OPCACHE=true
 
 RUN if [ ${INSTALL_OPCACHE} = true ]; then \
     docker-php-ext-install opcache \
@@ -717,7 +720,7 @@ COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 # Mysqli Modifications:
 ###########################################################################
 
-ARG INSTALL_MYSQLI=false
+ARG INSTALL_MYSQLI=true
 
 RUN if [ ${INSTALL_MYSQLI} = true ]; then \
     docker-php-ext-install mysqli \
@@ -728,7 +731,7 @@ RUN if [ ${INSTALL_MYSQLI} = true ]; then \
 # Human Language and Character Encoding Support:
 ###########################################################################
 
-ARG INSTALL_INTL=false
+ARG INSTALL_INTL=true
 
 RUN if [ ${INSTALL_INTL} = true ]; then \
     # Install intl and requirements
@@ -755,7 +758,7 @@ RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
 # LDAP:
 ###########################################################################
 
-ARG INSTALL_LDAP=false
+ARG INSTALL_LDAP=true
 
 RUN if [ ${INSTALL_LDAP} = true ]; then \
     apt-get install -yqq libldap2-dev && \
@@ -823,7 +826,7 @@ RUN set -eux; \
 
 USER root
 
-ARG INSTALL_IMAGE_OPTIMIZERS=false
+ARG INSTALL_IMAGE_OPTIMIZERS=true
 
 RUN if [ ${INSTALL_IMAGE_OPTIMIZERS} = true ]; then \
     apt-get install -yqq jpegoptim optipng pngquant gifsicle \
@@ -835,7 +838,7 @@ RUN if [ ${INSTALL_IMAGE_OPTIMIZERS} = true ]; then \
 
 USER root
 
-ARG INSTALL_IMAGEMAGICK=false
+ARG INSTALL_IMAGEMAGICK=true
 ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
 
@@ -878,7 +881,7 @@ RUN if [ ${INSTALL_SMB} = true ]; then \
 # IMAP:
 ###########################################################################
 
-ARG INSTALL_IMAP=false
+ARG INSTALL_IMAP=true
 
 RUN if [ ${INSTALL_IMAP} = true ]; then \
     apt-get install -yqq libc-client-dev libkrb5-dev && \
@@ -919,7 +922,7 @@ RUN if [ $INSTALL_PHALCON = true ]; then \
 # APCU:
 ###########################################################################
 
-ARG INSTALL_APCU=false
+ARG INSTALL_APCU=true
 
 RUN if [ ${INSTALL_APCU} = true ]; then \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
@@ -936,7 +939,7 @@ RUN if [ ${INSTALL_APCU} = true ]; then \
 
 USER root
 
-ARG INSTALL_YAML=false
+ARG INSTALL_YAML=true
 
 RUN if [ ${INSTALL_YAML} = true ]; then \
     apt-get install -yqq libyaml-dev; \
@@ -954,7 +957,7 @@ RUN if [ ${INSTALL_YAML} = true ]; then \
 # RDKAFKA:
 ###########################################################################
 
-ARG INSTALL_RDKAFKA=false
+ARG INSTALL_RDKAFKA=true
 
 RUN if [ ${INSTALL_RDKAFKA} = true ]; then \
     apt-get install -yqq librdkafka-dev && \
@@ -966,7 +969,7 @@ RUN if [ ${INSTALL_RDKAFKA} = true ]; then \
 # GETTEXT:
 ###########################################################################
 
-ARG INSTALL_GETTEXT=false
+ARG INSTALL_GETTEXT=true
 
 RUN if [ ${INSTALL_GETTEXT} = true ]; then \
     apt-get install -yqq zlib1g-dev libicu-dev g++ libpq-dev libssl-dev gettext && \
@@ -1007,7 +1010,7 @@ RUN if [ ${INSTALL_MYSQL_CLIENT} = true ]; then \
 
 USER root
 
-ARG INSTALL_PING=false
+ARG INSTALL_PING=true
 
 RUN if [ ${INSTALL_PING} = true ]; then \
     apt-get -y install inetutils-ping \
@@ -1046,7 +1049,7 @@ RUN if [ ${INSTALL_DOCKER_CLIENT} = true ]; then \
 
 USER root
 
-ARG INSTALL_FFMPEG=false
+ARG INSTALL_FFMPEG=true
 
 RUN if [ ${INSTALL_FFMPEG} = true ]; then \
     apt-get update -y && \
@@ -1079,7 +1082,7 @@ RUN if [ ${INSTALL_AUDIOWAVEFORM} = true ]; then \
 #####################################
 USER root
 
-ARG INSTALL_POPPLER_UTILS=false
+ARG INSTALL_POPPLER_UTILS=true
 
 RUN if [ ${INSTALL_POPPLER_UTILS} = true ]; then \
   apt-get -y install poppler-utils antiword \
@@ -1173,7 +1176,7 @@ RUN if [ ${INSTALL_CACHETOOL} = true ]; then \
 # XMLRPC:
 ###########################################################################
 
-ARG INSTALL_XMLRPC=false
+ARG INSTALL_XMLRPC=true
 
 RUN if [ ${INSTALL_XMLRPC} = true ]; then \
   apt-get -yq install libxml2-dev; \
@@ -1289,7 +1292,7 @@ RUN set -xe; \
 ###########################################################################
 # Legacy Openssl Config:
 ###########################################################################
-ARG LEGACY_OPENSSL=false
+ARG LEGACY_OPENSSL=true
 
 RUN if [ ${LEGACY_OPENSSL} = true ]; then \
   if openssl version | grep -q "OpenSSL 3"; then \
@@ -1339,7 +1342,7 @@ RUN if [ ${INSTALL_ZMQ} = true ]; then \
 ############################################################################
 USER root
 
-ARG INSTALL_EVENT=false
+ARG INSTALL_EVENT=true
 
 RUN set -eux; \
   if [ ${INSTALL_EVENT} = true ]; then \
@@ -1371,7 +1374,7 @@ RUN set -eux; \
 
 USER root
 
-ARG INSTALL_DNSUTILS=false
+ARG INSTALL_DNSUTILS=true
 
 RUN if [ ${INSTALL_DNSUTILS} = true ]; then \
     apt-get update && apt-get install -y dnsutils \
